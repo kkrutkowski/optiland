@@ -10,6 +10,8 @@ with multiple wavelengths simultaneously.
 Kramer Harrison, 2024
 """
 
+import optiland.backend as be
+
 
 class Wavelength:
     """Represents a wavelength value with support for unit conversion.
@@ -160,6 +162,35 @@ class WavelengthGroup:
             is_primary = True
 
         self.wavelengths.append(Wavelength(value, is_primary, unit))
+
+    def add_wavelengths(self, min_value, max_value, num_wavelengths, unit="um"):
+        """Add new wavelengths corresponding to the geometrically-spaced Chebyshev nodes
+
+        Args:
+            min_value (float): Minimum wavelength value.
+            max_value (float): Maximum wavelength value.
+            num_wavelengths (int) : Minimum number of wavelengths to be added.
+            unit (str, optional): The unit of the wavelength. Default is 'um'.
+
+        """
+        if not isinstance(num_wavelengths, int):
+            raise ValueError("num_wavelengths must be a positive integer")
+
+        if min_value <= 0 or max_value <= 0:
+            raise ValueError("min_value and max_value must be positive")
+
+        num_wavelengths = be.abs(num_wavelengths)
+        if num_wavelengths % 2 == 0:
+            num_wavelengths += 1
+        nodes = be.arange(1, num_wavelengths + 1)
+        nodes = be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths))
+        middle = be.sqrt(min_value * max_value)
+        span = 0.5 * be.log2(max_value / min_value)
+
+        for i, node in enumerate(nodes):
+            is_primary = i == num_wavelengths // 2
+            value = middle * 2 ** (-span * node)
+            self.wavelengths.append(Wavelength(value, is_primary, unit))
 
     def get_wavelength(self, wavelength_number):
         """Get the value of a specific wavelength.

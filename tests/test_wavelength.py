@@ -1,7 +1,7 @@
 import pytest
 
 from optiland.wavelength import Wavelength, WavelengthGroup
-
+import optiland.backend as be
 
 class TestWavelengths:
     def test_wavelength_initialization(self, set_test_backend):
@@ -64,6 +64,24 @@ class TestWavelengthGroups:
         wg.add_wavelength(500, unit="nm")
         assert wg.num_wavelengths == 1
         assert wg.get_wavelength(0) == 0.5
+
+    def test_add_wavelengths(self, set_test_backend):
+        wg = WavelengthGroup()
+        wg.add_wavelength(500, unit="nm")
+        assert wg.num_wavelengths == 1
+        assert wg.get_wavelength(0) == 0.5
+
+    def test_add_wavelengths(self, set_test_backend):
+        wg = WavelengthGroup()
+        wg.add_wavelengths(400, 800, 4, unit="nm")
+        assert wg.num_wavelengths == 5
+        middle = be.sqrt(0.4 * 0.8)
+        assert be.isclose(wg.wavelengths[2].value, middle)
+        assert wg.wavelengths[2].is_primary
+        assert be.isclose(wg.wavelengths[0].value, middle * 2**(-0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))))
+        assert be.isclose(wg.wavelengths[1].value, middle * 2**(-0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))))
+        assert be.isclose(wg.wavelengths[3].value, middle * 2**(0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))))
+        assert be.isclose(wg.wavelengths[4].value, middle * 2**(0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))))
 
     def test_primary_wavelength(self, set_test_backend):
         wg = WavelengthGroup()

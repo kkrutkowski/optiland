@@ -263,16 +263,13 @@ def add_wavelengths(
 
     if sampling == "chebyshev":
         nodes = 0.5 * (1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths)))
-        if scale == "log":
-            span = be.log2(max_value / min_value)
 
     elif sampling == "uniform":
         nodes -= 0.5
         nodes /= num_wavelengths
-        if scale == "log":
-            span = be.log2(max_value / min_value)
 
     if scale == "log":
+        span = be.log2(max_value / min_value)
         for i, node in enumerate(nodes):
             is_primary = i == num_wavelengths // 2
             value = min_value * 2 ** (span * node)

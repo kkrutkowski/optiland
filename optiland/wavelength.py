@@ -233,13 +233,15 @@ def add_wavelengths(
         num_wavelengths (int) : The number of wavelengths to be added.
             Has to be an odd integer.
         unit (str, optional): The unit of the wavelength. Default is 'um'.
-        sampling (str, optional): The sampling algorithm used. Defaults to 'chebyshev'. Supported options are:
-            'chebyshev' - chebyshev nodes of the first type
-            'uniform' - uniformly spaced nodes across the specified range
-        scale (str, optional): space in which the nodes are sampled. Defaults to 'log'. Supported options are:
-            'log' - nodes are sampled in the logarithms of wavelength.
-            'frequency' - nodes sampled in the frequency domain.
-            'wavelength' - nodes sampled in the frequency domain. It's strongly discouraged to use this option.
+        sampling (str, optional): The sampling algorithm used. Defaults to 'chebyshev'.
+            Currently supported options are:
+                'chebyshev' - chebyshev nodes of the first type
+                'uniform' - uniformly spaced nodes across the specified range
+        scale (str, optional): space in which the nodes are sampled. Defaults to 'log'.
+            Currently supported options are:
+                'log' - nodes are sampled in the logarithms of wavelength.
+                'frequency' - nodes sampled in the frequency domain.
+                'wavelength' - nodes sampled in the frequency domain. Not recommended.
 
 
     """

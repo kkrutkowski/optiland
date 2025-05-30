@@ -268,6 +268,8 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
         min_value = min_value**power
         max_value = max_value**power
         span = max_value - min_value
+        if sampling=="chebyshev":
+            span *= 0.5
         for i, node in enumerate(nodes):
             is_primary = i == num_wavelengths // 2
             value = min_value + (span * node)

@@ -265,8 +265,7 @@ def add_wavelengths(
         nodes = 0.5 * (1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths)))
 
     elif sampling == "uniform":
-        nodes -= 0.5
-        nodes /= num_wavelengths
+        nodes = (nodes - 0.5) / num_wavelengths
 
     if scale == "log":
         span = be.log2(max_value / min_value)

@@ -246,17 +246,16 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
     elif scale=="wavelength":
         power = 1.0
 
-    nodes = be.arange(1, num_wavelengths + 1)
+    nodes = be.arange(1.0, num_wavelengths + 1.0)
 
     if sampling=="chebyshev":
         nodes = 1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths))
         if scale=="log":
-            middle = be.sqrt(min_value * max_value)
-            span = be.log2(max_value / min_value)
+            span = 0.5 * be.log2(max_value / min_value)
 
             for i, node in enumerate(nodes):
                 is_primary = i == num_wavelengths // 2
-                value = min_value * 2 ** (0.5 * span * node)
+                value = min_value * 2 ** (span * node)
                 wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
         else:
             min_value = min_value**power
@@ -264,5 +263,24 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
             span = max_value - min_value
             for i, node in enumerate(nodes):
                 is_primary = i == num_wavelengths // 2
-                value = min_value + (0.5 * span * node)
+                value = min_value + (span * node)
+                wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))
+
+    elif sampling=="uniform":
+        nodes -= 0.5
+        nodes /= num_wavelengths
+        if scale=="log":
+            span = be.log2(max_value / min_value)
+
+            for i, node in enumerate(nodes):
+                is_primary = i == num_wavelengths // 2
+                value = min_value * 2 ** (span * node)
+                wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
+        else:
+            min_value = min_value**power
+            max_value = max_value**power
+            span = max_value - min_value
+            for i, node in enumerate(nodes):
+                is_primary = i == num_wavelengths // 2
+                value = min_value + (span * node)
                 wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))

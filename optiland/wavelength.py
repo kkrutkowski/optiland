@@ -253,34 +253,22 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
         if scale=="log":
             span = 0.5 * be.log2(max_value / min_value)
 
-            for i, node in enumerate(nodes):
-                is_primary = i == num_wavelengths // 2
-                value = min_value * 2 ** (span * node)
-                wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
-        else:
-            min_value = min_value**power
-            max_value = max_value**power
-            span = max_value - min_value
-            for i, node in enumerate(nodes):
-                is_primary = i == num_wavelengths // 2
-                value = min_value + (span * node)
-                wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))
-
     elif sampling=="uniform":
         nodes -= 0.5
         nodes /= num_wavelengths
         if scale=="log":
             span = be.log2(max_value / min_value)
 
+    if scale=="log":
             for i, node in enumerate(nodes):
                 is_primary = i == num_wavelengths // 2
                 value = min_value * 2 ** (span * node)
                 wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
-        else:
-            min_value = min_value**power
-            max_value = max_value**power
-            span = max_value - min_value
-            for i, node in enumerate(nodes):
-                is_primary = i == num_wavelengths // 2
-                value = min_value + (span * node)
-                wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))
+    else:
+        min_value = min_value**power
+        max_value = max_value**power
+        span = max_value - min_value
+        for i, node in enumerate(nodes):
+            is_primary = i == num_wavelengths // 2
+            value = min_value + (span * node)
+            wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))

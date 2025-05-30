@@ -223,7 +223,7 @@ def add_wavelengths(
     unit="um",
     *,
     sampling="chebyshev",
-    scale="log",
+    scale="frequency",
 ):
     """Add new wavelengths corresponding to the geometrically-spaced Chebyshev nodes
 

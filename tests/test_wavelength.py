@@ -3,6 +3,7 @@ import pytest
 from optiland.wavelength import Wavelength, WavelengthGroup, add_wavelengths
 import optiland.backend as be
 
+
 class TestWavelengths:
     def test_wavelength_initialization(self, set_test_backend):
         wl = Wavelength(500, unit="nm")
@@ -115,52 +116,87 @@ class TestWavelengthGroups:
             WavelengthGroup.from_dict({})
 
     def test_add_wavelengths(self, set_test_backend):
-        #exp-Chebyshev
+        # exp-Chebyshev
         wg = WavelengthGroup()
         add_wavelengths(wg, 400, 800, 5, unit="nm", sampling="chebyshev", scale="log")
         assert wg.num_wavelengths == 5
         middle = be.sqrt(0.4 * 0.8)
         assert be.isclose(wg.wavelengths[2].value, middle)
         assert wg.wavelengths[2].is_primary
-        assert be.isclose(wg.wavelengths[0].value, middle * 2**(-0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))))
-        assert be.isclose(wg.wavelengths[1].value, middle * 2**(-0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))))
-        assert be.isclose(wg.wavelengths[3].value, middle * 2**(0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))))
-        assert be.isclose(wg.wavelengths[4].value, middle * 2**(0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))))
-        #frequency Chebyshev
+        assert be.isclose(
+            wg.wavelengths[0].value,
+            middle * 2 ** (-0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))),
+        )
+        assert be.isclose(
+            wg.wavelengths[1].value,
+            middle * 2 ** (-0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))),
+        )
+        assert be.isclose(
+            wg.wavelengths[3].value,
+            middle * 2 ** (0.125 * (be.sqrt(10 - 2 * be.sqrt(5)))),
+        )
+        assert be.isclose(
+            wg.wavelengths[4].value,
+            middle * 2 ** (0.125 * (be.sqrt(10 + 2 * be.sqrt(5)))),
+        )
+        # frequency Chebyshev
         wg = WavelengthGroup()
-        add_wavelengths(wg, 400, 800, 5, unit="nm", sampling="chebyshev", scale="frequency")
+        add_wavelengths(
+            wg, 400, 800, 5, unit="nm", sampling="chebyshev", scale="frequency"
+        )
         assert wg.num_wavelengths == 5
-        middle = be.as_array_1d(2.0 / (1.0/0.4 + 1.0/0.8))
+        middle = be.as_array_1d(2.0 / (1.0 / 0.4 + 1.0 / 0.8))
         assert be.isclose(wg.wavelengths[2].value, middle)
         assert wg.wavelengths[2].is_primary
-        #wavelength Chebyshev
+        # wavelength Chebyshev
         wg = WavelengthGroup()
         add_wavelengths(wg, 0.4, 0.8, 5, sampling="chebyshev", scale="wavelength")
         assert wg.num_wavelengths == 5
         middle = 0.6
-        wavelengths_ref = middle + 0.05 * be.as_array_1d([-be.sqrt(10 + 2 * be.sqrt(5)), -be.sqrt(10 - 2 * be.sqrt(5)), 0, be.sqrt(10 - 2 * be.sqrt(5)), be.sqrt(10 + 2 * be.sqrt(5))])
-        assert be.allclose(wavelengths_ref, be.as_array_1d([wg.wavelengths[i].value for i in range(5)]))
-        #exponential
+        wavelengths_ref = middle + 0.05 * be.as_array_1d(
+            [
+                -be.sqrt(10 + 2 * be.sqrt(5)),
+                -be.sqrt(10 - 2 * be.sqrt(5)),
+                0,
+                be.sqrt(10 - 2 * be.sqrt(5)),
+                be.sqrt(10 + 2 * be.sqrt(5)),
+            ]
+        )
+        assert be.allclose(
+            wavelengths_ref, be.as_array_1d([wg.wavelengths[i].value for i in range(5)])
+        )
+        # exponential
         wg = WavelengthGroup()
         add_wavelengths(wg, 0.25, 1.0, 7, sampling="uniform", scale="log")
         assert wg.num_wavelengths == 7
         assert be.isclose(wg.wavelengths[3].value, be.as_array_1d(0.5))
         assert be.isclose(0.25 / wg.wavelengths[0].value, wg.wavelengths[6].value)
         for i in range(1):
-            assert be.isclose(wg.wavelengths[i].value / wg.wavelengths[i+1].value, wg.wavelengths[6].value**2)
-        #uniform (frequency)
+            assert be.isclose(
+                wg.wavelengths[i].value / wg.wavelengths[i + 1].value,
+                wg.wavelengths[6].value ** 2,
+            )
+        # uniform (frequency)
         wg = WavelengthGroup()
         add_wavelengths(wg, 0.25, 1.0, 7, sampling="uniform", scale="frequency")
         assert wg.num_wavelengths == 7
         assert be.isclose(wg.wavelengths[3].value, be.as_array_1d(0.4))
-        assert be.isclose(4 - 1/wg.wavelengths[0].value, 1/wg.wavelengths[6].value - 1)
+        assert be.isclose(
+            4 - 1 / wg.wavelengths[0].value, 1 / wg.wavelengths[6].value - 1
+        )
         for i in range(1):
-            assert be.isclose(1/wg.wavelengths[i].value - 1/wg.wavelengths[i+1].value, 2*(1/wg.wavelengths[6].value - 1))
-        #uniform (wavelength)
+            assert be.isclose(
+                1 / wg.wavelengths[i].value - 1 / wg.wavelengths[i + 1].value,
+                2 * (1 / wg.wavelengths[6].value - 1),
+            )
+        # uniform (wavelength)
         wg = WavelengthGroup()
         add_wavelengths(wg, 0.25, 1.0, 7, sampling="uniform", scale="wavelength")
         assert wg.num_wavelengths == 7
         assert be.isclose(wg.wavelengths[3].value, be.as_array_1d(0.625))
         assert be.isclose(wg.wavelengths[0].value - 0.25, 1 - wg.wavelengths[6].value)
         for i in range(1):
-            assert be.isclose(wg.wavelengths[i+1].value - wg.wavelengths[i].value, 2*(1 - wg.wavelengths[6].value))
+            assert be.isclose(
+                wg.wavelengths[i + 1].value - wg.wavelengths[i].value,
+                2 * (1 - wg.wavelengths[6].value),
+            )

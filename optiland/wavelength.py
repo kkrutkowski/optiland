@@ -163,7 +163,6 @@ class WavelengthGroup:
 
         self.wavelengths.append(Wavelength(value, is_primary, unit))
 
-
     def get_wavelength(self, wavelength_number):
         """Get the value of a specific wavelength.
 
@@ -215,7 +214,17 @@ class WavelengthGroup:
 
         return new_group
 
-def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, unit="um", *, sampling="chebyshev", scale="log"):
+
+def add_wavelengths(
+    wavelength_group,
+    min_value,
+    max_value,
+    num_wavelengths,
+    unit="um",
+    *,
+    sampling="chebyshev",
+    scale="log",
+):
     """Add new wavelengths corresponding to the geometrically-spaced Chebyshev nodes
 
     Args:
@@ -225,7 +234,11 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
         unit (str, optional): The unit of the wavelength. Default is 'um'.
 
     """
-    if not isinstance(num_wavelengths, int) or num_wavelengths%2 == 0 or num_wavelengths <= 0:
+    if (
+        not isinstance(num_wavelengths, int)
+        or num_wavelengths % 2 == 0
+        or num_wavelengths <= 0
+    ):
         raise ValueError("num_wavelengths must be an odd positive integer")
 
     if min_value <= 0 or max_value <= 0:
@@ -241,29 +254,29 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
     else:
         raise ValueError(f"Unknown scale: {scale!r}")
 
-    if scale=="frequency":
+    if scale == "frequency":
         power = -1.0
-    elif scale=="wavelength":
+    elif scale == "wavelength":
         power = 1.0
 
     nodes = be.arange(1.0, num_wavelengths + 1.0)
 
-    if sampling=="chebyshev":
+    if sampling == "chebyshev":
         nodes = 0.5 * (1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths)))
-        if scale=="log":
+        if scale == "log":
             span = be.log2(max_value / min_value)
 
-    elif sampling=="uniform":
+    elif sampling == "uniform":
         nodes -= 0.5
         nodes /= num_wavelengths
-        if scale=="log":
+        if scale == "log":
             span = be.log2(max_value / min_value)
 
-    if scale=="log":
-            for i, node in enumerate(nodes):
-                is_primary = i == num_wavelengths // 2
-                value = min_value * 2 ** (span * node)
-                wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
+    if scale == "log":
+        for i, node in enumerate(nodes):
+            is_primary = i == num_wavelengths // 2
+            value = min_value * 2 ** (span * node)
+            wavelength_group.wavelengths.append(Wavelength(value, is_primary, unit))
     else:
         min_value = min_value**power
         max_value = max_value**power
@@ -271,8 +284,6 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
         for i, node in enumerate(nodes):
             is_primary = i == num_wavelengths // 2
             value = min_value + (span * node)
-            wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))
-
-
-
-
+            wavelength_group.wavelengths.append(
+                Wavelength(value ** (power), is_primary, unit)
+            )

@@ -249,9 +249,9 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
     nodes = be.arange(1.0, num_wavelengths + 1.0)
 
     if sampling=="chebyshev":
-        nodes = 1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths))
+        nodes = 0.5 * (1.0 - be.cos((2 * nodes - 1) * be.pi / (2 * num_wavelengths)))
         if scale=="log":
-            span = 0.5 * be.log2(max_value / min_value)
+            span = be.log2(max_value / min_value)
 
     elif sampling=="uniform":
         nodes -= 0.5
@@ -268,9 +268,11 @@ def add_wavelengths(wavelength_group, min_value, max_value, num_wavelengths, uni
         min_value = min_value**power
         max_value = max_value**power
         span = max_value - min_value
-        if sampling=="chebyshev":
-            span *= 0.5
         for i, node in enumerate(nodes):
             is_primary = i == num_wavelengths // 2
             value = min_value + (span * node)
             wavelength_group.wavelengths.append(Wavelength(value**(power), is_primary, unit))
+
+
+
+
